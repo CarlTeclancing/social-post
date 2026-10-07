@@ -1,1 +1,27 @@
-import {Router} from 'express';import bcrypt from 'bcryptjs';import jwt from 'jsonwebtoken';import {prisma} from '../config/prisma.js';const r=Router();r.post('/register',async(req,res)=>{const {email,password}=req.body;const u=await prisma.user.create({data:{email,passwordHash:await bcrypt.hash(password,12)}});res.json({token:jwt.sign({id:u.id,email:u.email},process.env.JWT_SECRET,{expiresIn:'7d'})})});r.post('/login',async(req,res)=>{const u=await prisma.user.findUnique({where:{email:req.body.email}});if(!u||!await bcrypt.compare(req.body.password,u.passwordHash))return res.status(401).json({error:'Invalid credentials'});res.json({token:jwt.sign({id:u.id,email:u.email},process.env.JWT_SECRET,{expiresIn:'7d'})})});export default r;
+import { Router } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { prisma } from "../config/prisma.js";
+const r = Router();
+r.post("/register", async (req, res) => {
+  const { email, password } = req.body;
+  const u = await prisma.user.create({
+    data: { email, passwordHash: await bcrypt.hash(password, 12) },
+  });
+  res.json({
+    token: jwt.sign({ id: u.id, email: u.email }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    }),
+  });
+});
+r.post("/login", async (req, res) => {
+  const u = await prisma.user.findUnique({ where: { email: req.body.email } });
+  if (!u || !(await bcrypt.compare(req.body.password, u.passwordHash)))
+    return res.status(401).json({ error: "Invalid credentials" });
+  res.json({
+    token: jwt.sign({ id: u.id, email: u.email }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    }),
+  });
+});
+export default r;

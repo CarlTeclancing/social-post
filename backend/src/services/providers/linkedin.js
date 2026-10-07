@@ -1,1 +1,32 @@
-import axios from 'axios'; export async function publishLinkedIn(d){const commentary=d.contentOverride||d.post.content; if(d.post.media.length) throw new Error('LinkedIn media upload requires asset initialization; text posting is enabled in this MVP adapter.'); const r=await axios.post('https://api.linkedin.com/rest/posts',{author:d.socialAccount.platformAccountId,commentary,visibility:'PUBLIC',distribution:{feedDistribution:'MAIN_FEED',targetEntities:[],thirdPartyDistributionChannels:[]},lifecycleState:'PUBLISHED',isReshareDisabledByAuthor:false},{headers:{Authorization:`Bearer ${d.socialAccount.accessToken}`,'X-Restli-Protocol-Version':'2.0.0','Linkedin-Version':process.env.LINKEDIN_VERSION||'202609','Content-Type':'application/json'}});return {id:r.headers['x-restli-id']};}
+import axios from "axios";
+export async function publishLinkedIn(d) {
+  const commentary = d.contentOverride || d.post.content;
+  if (d.post.media.length)
+    throw new Error(
+      "LinkedIn media upload requires asset initialization; text posting is enabled in this MVP adapter.",
+    );
+  const r = await axios.post(
+    "https://api.linkedin.com/rest/posts",
+    {
+      author: d.socialAccount.platformAccountId,
+      commentary,
+      visibility: "PUBLIC",
+      distribution: {
+        feedDistribution: "MAIN_FEED",
+        targetEntities: [],
+        thirdPartyDistributionChannels: [],
+      },
+      lifecycleState: "PUBLISHED",
+      isReshareDisabledByAuthor: false,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${d.socialAccount.accessToken}`,
+        "X-Restli-Protocol-Version": "2.0.0",
+        "Linkedin-Version": process.env.LINKEDIN_VERSION || "202609",
+        "Content-Type": "application/json",
+      },
+    },
+  );
+  return { id: r.headers["x-restli-id"] };
+}

@@ -1,1 +1,20 @@
-import 'dotenv/config';import express from 'express';import cors from 'cors';import authRoutes from './routes/auth.js';import socialRoutes from './routes/social.js';import postRoutes from './routes/posts.js';import {startScheduler} from './workers/scheduler.js';const app=express();app.use(cors({origin:process.env.FRONTEND_URL||'http://localhost:5173'}));app.use(express.json({limit:'10mb'}));app.get('/health',(req,res)=>res.json({ok:true}));app.use('/api/auth',authRoutes);app.use('/api/social',socialRoutes);app.use('/api/posts',postRoutes);app.use((e,req,res,next)=>{console.error(e);res.status(500).json({error:e.message||'Server error'})});app.listen(process.env.PORT||4000,()=>console.log('API running'));startScheduler();
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import authRoutes from "./routes/auth.js";
+import socialRoutes from "./routes/social.js";
+import postRoutes from "./routes/posts.js";
+import { startScheduler } from "./workers/scheduler.js";
+const app = express();
+app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
+app.use(express.json({ limit: "10mb" }));
+app.get("/health", (req, res) => res.json({ ok: true }));
+app.use("/api/auth", authRoutes);
+app.use("/api/social", socialRoutes);
+app.use("/api/posts", postRoutes);
+app.use((e, req, res, next) => {
+  console.error(e);
+  res.status(500).json({ error: e.message || "Server error" });
+});
+app.listen(process.env.PORT || 4000, () => console.log("API running"));
+startScheduler();
