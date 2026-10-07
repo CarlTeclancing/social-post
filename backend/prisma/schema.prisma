@@ -1,0 +1,11 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+
+enum Platform { FACEBOOK INSTAGRAM LINKEDIN TIKTOK }
+enum PostStatus { DRAFT SCHEDULED PROCESSING PUBLISHED PARTIAL_FAILED FAILED }
+enum DestinationStatus { PENDING PROCESSING PUBLISHED FAILED }
+model User { id String @id @default(cuid()) email String @unique passwordHash String createdAt DateTime @default(now()) socialAccounts SocialAccount[] posts Post[] }
+model SocialAccount { id String @id @default(cuid()) userId String platform Platform platformAccountId String displayName String? accessToken String refreshToken String? tokenExpiresAt DateTime? metadata Json? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt user User @relation(fields:[userId],references:[id],onDelete:Cascade) destinations PostDestination[] @@unique([userId,platform,platformAccountId]) }
+model Post { id String @id @default(cuid()) userId String content String status PostStatus @default(DRAFT) scheduledAt DateTime? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt user User @relation(fields:[userId],references:[id],onDelete:Cascade) media PostMedia[] destinations PostDestination[] }
+model PostMedia { id String @id @default(cuid()) postId String type String url String createdAt DateTime @default(now()) post Post @relation(fields:[postId],references:[id],onDelete:Cascade) }
+model PostDestination { id String @id @default(cuid()) postId String socialAccountId String platform Platform contentOverride String? status DestinationStatus @default(PENDING) platformPostId String? errorMessage String? attempts Int @default(0) publishedAt DateTime? post Post @relation(fields:[postId],references:[id],onDelete:Cascade) socialAccount SocialAccount @relation(fields:[socialAccountId],references:[id],onDelete:Cascade) @@unique([postId,socialAccountId]) }
