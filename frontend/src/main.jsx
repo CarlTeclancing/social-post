@@ -13,6 +13,8 @@ function App() {
     [schedule, setSchedule] = useState(""),
     [mediaUrl, setMediaUrl] = useState(""),
     [mediaType, setMediaType] = useState("image/jpeg"),
+    [mediaFile, setMediaFile] = useState(null),
+    [isUploading, setIsUploading] = useState(false),
     [tab, setTab] = useState("compose"),
     [err, setErr] = useState("");
   const load = async () => {
@@ -46,10 +48,37 @@ function App() {
       setContent("");
       setSchedule("");
       setMediaUrl("");
+      setMediaType("image/jpeg");
+      setMediaFile(null);
       setTimeout(load, 1200);
       setTab("history");
     } catch (e) {
       setErr(e.message);
+    }
+  }
+  async function uploadMedia(file) {
+    if (!file) return;
+    setErr("");
+    setIsUploading(true);
+    try {
+      const result = await api("/media", {
+        method: "POST",
+        body: (() => {
+          const form = new FormData();
+          form.append("file", file);
+          return form;
+        })(),
+      });
+      setMediaUrl(result.url);
+      setMediaType(result.type);
+      setMediaFile(file);
+    } catch (e) {
+      setErr(e.message);
+      setMediaUrl("");
+      setMediaType("image/jpeg");
+      setMediaFile(null);
+    } finally {
+      setIsUploading(false);
     }
   }
   return (
@@ -107,23 +136,21 @@ function App() {
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="What do you want to share?"
               />
-              <div className="field">
+              <div className="field media-field">
                 <label>
-                  Public media URL{" "}
-                  <small>(required for Instagram/TikTok)</small>
+                  Image or video <small>(max 50 MB)</small>
                 </label>
                 <input
-                  value={mediaUrl}
-                  onChange={(e) => setMediaUrl(e.target.value)}
-                  placeholder="https://.../image.jpg or video.mp4"
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={(e) => uploadMedia(e.target.files?.[0])}
                 />
-                <select
-                  value={mediaType}
-                  onChange={(e) => setMediaType(e.target.value)}
-                >
-                  <option value="image/jpeg">Image</option>
-                  <option value="video/mp4">Video</option>
-                </select>
+                {mediaFile && (
+                  <p className="media-preview">
+                    {mediaFile.name} ({mediaType.startsWith("video/") ? "Video" : "Image"})
+                  </p>
+                )}
+                {isUploading && <p className="muted">Uploading to Cloudflare...</p>}
               </div>
               <h3>Publish to</h3>
               <div className="channels">

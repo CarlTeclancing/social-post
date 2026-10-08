@@ -114,6 +114,14 @@ header p,
   width: 23%;
   margin-left: 2%;
 }
+.media-field input {
+  width: 100%;
+}
+.media-preview {
+  margin: 10px 0 0;
+  color: #17894d;
+  font-size: 14px;
+}
 input,
 select {
   border: 1px solid #dddde3;
