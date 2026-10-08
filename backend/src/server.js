@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import socialRoutes from "./routes/social.js";
+import mediaRoutes from "./routes/media.js";
 import postRoutes from "./routes/posts.js";
 import { startScheduler } from "./workers/scheduler.js";
 const app = express();
@@ -11,6 +12,7 @@ app.use(express.json({ limit: "10mb" }));
 app.get("/health", (req, res) => res.json({ ok: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/social", socialRoutes);
+app.use("/api/media", mediaRoutes);
 app.use("/api/posts", postRoutes);
 app.use((e, req, res, next) => {
   console.error(e);
