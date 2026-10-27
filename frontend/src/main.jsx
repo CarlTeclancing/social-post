@@ -4,7 +4,7 @@ import { api } from "./lib/api";
 import { Send, Calendar, RefreshCw, Plus, LogOut } from "lucide-react";
 import "./style.css";
 const platforms = ["FACEBOOK", "INSTAGRAM", "LINKEDIN", "TIKTOK"];
-function App() {
+export function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [accounts, setAccounts] = useState([]),
     [posts, setPosts] = useState([]),
@@ -263,25 +263,32 @@ function Auth({ onToken }) {
   return (
     <div className="auth">
       <div className="authbox">
-        <div className="brand">
-          OnePost<span>.</span>
-        </div>
-        <h1>{mode === "login" ? "Welcome back" : "Create account"}</h1>
-        {err && <div className="error">{err}</div>}
-        <input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button className="primary" onClick={go}>
-          {mode === "login" ? "Sign in" : "Create account"}
-        </button>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            go();
+          }}
+        >
+          <div className="brand">
+            OnePost<span>.</span>
+          </div>
+          <h1>{mode === "login" ? "Welcome back" : "Create account"}</h1>
+          {err && <div className="error">{err}</div>}
+          <input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button className="primary" type="submit">
+            {mode === "login" ? "Sign in" : "Create account"}
+          </button>
+        </form>
         <button
           className="link"
           onClick={() => setMode(mode === "login" ? "register" : "login")}
@@ -362,4 +369,5 @@ function Accounts({ accounts, reload }) {
     </>
   );
 }
-createRoot(document.getElementById("root")).render(<App />);
+const root = document.getElementById("root");
+if (root) createRoot(root).render(<App />);
