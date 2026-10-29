@@ -7,7 +7,28 @@ import mediaRoutes from "./routes/media.js";
 import postRoutes from "./routes/posts.js";
 import { startScheduler } from "./workers/scheduler.js";
 const app = express();
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
+const configuredFrontendOrigin =
+  process.env.FRONTEND_URL || "http://localhost:5173";
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || origin === configuredFrontendOrigin) {
+        callback(null, true);
+        return;
+      }
+
+      try {
+        const { hostname, protocol } = new URL(origin);
+        const isLocalOrigin =
+          protocol === "http:" &&
+          ["localhost", "127.0.0.1", "[::1]"].includes(hostname);
+        callback(null, isLocalOrigin);
+      } catch {
+        callback(null, false);
+      }
+    },
+  }),
+);
 app.use(express.json({ limit: "10mb" }));
 app.get("/health", (req, res) => res.json({ ok: true }));
 app.use("/api/auth", authRoutes);

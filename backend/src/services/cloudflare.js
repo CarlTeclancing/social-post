@@ -45,7 +45,9 @@ export function validateMedia(file) {
 
 export async function uploadMediaToCloudflare(file) {
   if (!endpoint || !bucket || !accessKeyId || !secretAccessKey) {
-    throw new Error("Cloudflare R2 is not configured");
+    throw new Error(
+      "Cloudflare R2 is not configured. Add CLOUDFLARE_R2_* values to backend/.env before uploading media.",
+    );
   }
   validateMedia(file);
 
